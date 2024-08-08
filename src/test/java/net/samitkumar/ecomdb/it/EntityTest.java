@@ -43,7 +43,10 @@ public class EntityTest {
 
         assertAll(
                 () -> categories.forEach(System.out::println),
-                () -> productRepository.findAll().forEach(System.out::println)
+                () -> categoryRepository.findAll().forEach(System.out::println),
+                () -> categoryRepository.findById(1L).ifPresent(System.out::println),
+                () -> productRepository.findAll().forEach(System.out::println),
+                () -> productRepository.findById(1L).ifPresent(System.out::println)
         );
     }
 
