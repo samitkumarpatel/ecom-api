@@ -31,21 +31,16 @@ CREATE TABLE products (
 );
 
 -- Cart Table
+CREATE EXTENSION hstore;
 CREATE TABLE carts (
        id SERIAL PRIMARY KEY,
        user_id INT REFERENCES users(id) ON DELETE CASCADE,
+       payload JSONB,  -- JSONB column to store additional cart-related data
        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
--- Cart Items Table (Associating Products with Carts)
-CREATE TABLE cart_items (
-        id SERIAL PRIMARY KEY,
-        cart_id INT REFERENCES carts(id) ON DELETE CASCADE,
-        product_id INT REFERENCES products(id) ON DELETE CASCADE,
-        quantity INT NOT NULL,
-        UNIQUE(cart_id, product_id)
-);
+CREATE INDEX idx_cart_user ON carts(user_id);
+CREATE INDEX idx_cart_payload ON carts USING GIN (payload);
 
 -- Order Table
 CREATE TABLE orders (
@@ -66,9 +61,10 @@ CREATE TABLE order_items (
      price_at_purchase NUMERIC(10, 2) NOT NULL,
      UNIQUE(order_id, product_id)
 );
+CREATE INDEX idx_order_user ON orders(user_id);
 
 -- Example of Additional Indexes for Optimization (optional)
 CREATE INDEX idx_user_username ON users(username);
 CREATE INDEX idx_product_category ON products(category_id);
-CREATE INDEX idx_cart_user ON carts(user_id);
-CREATE INDEX idx_order_user ON orders(user_id);
+
+

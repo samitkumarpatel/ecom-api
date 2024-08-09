@@ -9,5 +9,5 @@ public class EcomDbApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(EcomDbApplication.class, args);
 	}
-
 }
+
