@@ -1,25 +1,22 @@
 package net.samitkumar.ecomdb.it;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.util.JSONPObject;
 import net.samitkumar.ecomdb.TestcontainersConfiguration;
-import net.samitkumar.ecomdb.entity.Cart;
 import net.samitkumar.ecomdb.entity.Category;
 import net.samitkumar.ecomdb.entity.Product;
-import net.samitkumar.ecomdb.repository.CartRepository;
-import net.samitkumar.ecomdb.repository.CategoryRepository;
-import net.samitkumar.ecomdb.repository.ProductRepository;
-import org.json.JSONObject;
+import net.samitkumar.ecomdb.entity.cart.Cart;
+import net.samitkumar.ecomdb.entity.cart.CartProductRef;
+import net.samitkumar.ecomdb.repository.CategoryRepositories;
+import net.samitkumar.ecomdb.repository.ProductRepositories;
+import net.samitkumar.ecomdb.repository.UserRepositories;
+import net.samitkumar.ecomdb.repository.cart.CartRepositories;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -27,65 +24,120 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 @Import(TestcontainersConfiguration.class)
 @SpringBootTest
 public class EntityTest {
+    @Autowired
+    CategoryRepositories categoriesRepositories;
 
     @Autowired
-    private CategoryRepository categoryRepository;
+    ProductRepositories productsRepositories;
 
     @Autowired
-    private ProductRepository productRepository;
+    UserRepositories usersRepositories;
 
     @Autowired
-    private CartRepository cartRepository;
-
-    @Autowired
-    ObjectMapper objectMapper;
+    CartRepositories cartRepositories;
 
     @Test
     @DisplayName("Entity Test")
-    void entityTest() throws JsonProcessingException {
-        //CATEGORY & PRODUCTS
-        var categories = categoryRepository
-                .saveAll(
-                    List.of(
+    void entityTest() {
+
+        //USERS
+        assertAll(
+                () -> usersRepositories.findAll().forEach(System.out::println)
+                /*
+                User[id=1, name=John Doe, email=johndoe@dev.net]
+                User[id=2, name=Jane Doe, email=janedoe@dev.net]
+                */
+        );
+
+        //CATEGORIES
+        var categories = categoriesRepositories.saveAll(
+                List.of(
                         new Category(null, "Electronics", "Electronics Items", Set.of()),
-                        new Category(null, "Clothing", "Clothing Items", null),
-                        new Category(null, "Books", "Books Items", Set.of(
-                                new Product(null, "Book 1", "Book 1 Description", 100.0, 5L, null)
-                        ))
-                    )
-                );
+                        new Category(null, "Clothing", "Clothing Items", Set.of(
+                                new Product(null, null, "Blazer", "Suits", 10.0, 100)
+                        )),
+                        new Category(null, "Books", "Books", Set.of())
+                )
+        );
 
         assertAll(
                 () -> categories.forEach(System.out::println),
-                () -> categoryRepository.findAll().forEach(System.out::println),
-                () -> categoryRepository.findById(1L).ifPresent(System.out::println),
-                () -> productRepository.findAll().forEach(System.out::println),
-                () -> productRepository.findById(1L).ifPresent(System.out::println)
+                /*
+                    Category[id=1, name=Electronics, description=Electronics Items, products=[]]
+                    Category[id=2, name=Clothing, description=Clothing Items, products=[Product[id=1, category=null, name=Blazer, description=Suits, price=10.0, quantity=100]]]
+                    Category[id=3, name=Books, description=Books, products=[]]
+                */
+                () -> categoriesRepositories.findAll().forEach(System.out::println),
+                /*
+                    Category[id=1, name=Electronics, description=Electronics Items, products=[]]
+                    Category[id=2, name=Clothing, description=Clothing Items, products=[Product[id=1, category=2, name=Blazer, description=Suits, price=10.0, quantity=100]]]
+                    Category[id=3, name=Books, description=Books, products=[]]
+                */
+                () -> categoriesRepositories.findById(1L).ifPresent(System.out::println)
+                /*
+                    Category[id=1, name=Electronics, description=Electronics Items, products=[]]
+                */
         );
 
-        // CARTS
-        Map<String, Object> item1 = new HashMap<>();
-        item1.put("productId", 1);
-        item1.put("name", "Milk");
-        item1.put("quantity", 1);
-        item1.put("price", 10.5);
-
-        Map<String, Object> item2 = new HashMap<>();
-        item2.put("productId", 6);
-        item2.put("name", "Chocolate");
-        item2.put("quantity", 3);
-        item2.put("price", 6.5);
-
-        // Add items to the payload list
-        List<Map<String, Object>> payload = List.of(item1, item2);
-        var json = objectMapper.writeValueAsString(payload);
-        System.out.println(json);
-        cartRepository.save(new Cart(null, 1L, Map.of("items", json)));
-
+        // PRODUCTS
+        var products = productsRepositories.saveAll(
+                List.of(
+                        new Product(null, categories.get(0).id(), "Laptop", "Laptop", 1000.0, 10),
+                        new Product(null, categories.get(1).id(), "T-Shirt", "T-Shirt", 10.0, 100),
+                        new Product(null, categories.get(2).id(), "Java Book", "Java Book", 20.0, 50)
+                )
+        );
         assertAll(
-                () -> cartRepository.findAll().forEach(System.out::println),
-                () -> cartRepository.findById(1L).ifPresent(System.out::println)
+                () -> products.forEach(System.out::println),
+                /*
+                    Product[id=2, category=1, name=Laptop, description=Laptop, price=1000.0, quantity=10]
+                    Product[id=3, category=2, name=T-Shirt, description=T-Shirt, price=10.0, quantity=100]
+                    Product[id=4, category=3, name=Java Book, description=Java Book, price=20.0, quantity=50]
+                 */
+                () -> productsRepositories.findAll().forEach(System.out::println),
+                /*
+                    Product[id=1, category=2, name=Blazer, description=Suits, price=10.0, quantity=100]
+                    Product[id=2, category=1, name=Laptop, description=Laptop, price=1000.0, quantity=10]
+                    Product[id=3, category=2, name=T-Shirt, description=T-Shirt, price=10.0, quantity=100]
+                    Product[id=4, category=3, name=Java Book, description=Java Book, price=20.0, quantity=50]
+                 */
+                () -> productsRepositories.findById(1L).ifPresent(System.out::println),
+                /*
+                    Product[id=1, category=2, name=Blazer, description=Suits, price=10.0, quantity=100]
+                 */
+                () -> productsRepositories.findByCategory(2L).forEach(System.out::println)
+                /*
+                    Product[id=1, category=2, name=Blazer, description=Suits, price=10.0, quantity=100]
+                    Product[id=3, category=2, name=T-Shirt, description=T-Shirt, price=10.0, quantity=100]
+                */
         );
+
+        //CART
+        var carts = cartRepositories.saveAll(
+                List.of(
+                        new Cart(null, 1L, Set.of(
+                                new CartProductRef(null, products.get(0).id(), 2),
+                                new CartProductRef(null, products.get(1).id(), 3)
+                        )),
+                        new Cart(null, 2L, Set.of(
+                                new CartProductRef(null, products.get(1).id(), 1),
+                                new CartProductRef(null, products.get(2).id(), 2)
+                        ))
+                )
+        );
+        assertAll(
+                () -> carts.forEach(System.out::println),
+                /*
+                    Cart[id=1, userId=1, cartItems=[CartProductRef[cart=null, product=2, quantity=2], CartProductRef[cart=null, product=3, quantity=3]]]
+                    Cart[id=2, userId=2, cartItems=[CartProductRef[cart=null, product=3, quantity=1], CartProductRef[cart=null, product=4, quantity=2]]]
+                */
+                () -> cartRepositories.findAll().forEach(System.out::println)
+                /*
+                    Cart[id=1, userId=1, cartItems=[CartProductRef[cart=1, product=2, quantity=2], CartProductRef[cart=1, product=3, quantity=3]]]
+                    Cart[id=2, userId=2, cartItems=[CartProductRef[cart=2, product=3, quantity=1], CartProductRef[cart=2, product=4, quantity=2]]]
+                */
+        );
+
     }
 
 }
