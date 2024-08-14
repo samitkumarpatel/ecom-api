@@ -1,17 +1,20 @@
 package net.samitkumar.ecomdb.it;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import net.samitkumar.ecomdb.TestcontainersConfiguration;
 import net.samitkumar.ecomdb.entity.Category;
+import net.samitkumar.ecomdb.entity.Inventory;
 import net.samitkumar.ecomdb.entity.Product;
 import net.samitkumar.ecomdb.entity.cart.Cart;
 import net.samitkumar.ecomdb.entity.cart.CartProductRef;
+import net.samitkumar.ecomdb.entity.favorite.Favorite;
+import net.samitkumar.ecomdb.entity.favorite.FavoriteProductRef;
 import net.samitkumar.ecomdb.entity.order.Order;
 import net.samitkumar.ecomdb.entity.order.OrderProductRef;
 import net.samitkumar.ecomdb.repository.CategoryRepositories;
 import net.samitkumar.ecomdb.repository.ProductRepositories;
 import net.samitkumar.ecomdb.repository.UserRepositories;
 import net.samitkumar.ecomdb.repository.cart.CartRepositories;
+import net.samitkumar.ecomdb.repository.favorite.FavoriteRepositories;
 import net.samitkumar.ecomdb.repository.order.OrderRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -42,6 +45,9 @@ public class EntityTest {
     @Autowired
     OrderRepository orderRepositories;
 
+    @Autowired
+    FavoriteRepositories favoriteRepositories;
+
     @Test
     @DisplayName("Entity Test")
     void entityTest() {
@@ -60,7 +66,7 @@ public class EntityTest {
                 List.of(
                         new Category(null, "Electronics", "Electronics Items", Set.of()),
                         new Category(null, "Clothing", "Clothing Items", Set.of(
-                                new Product(null, null, "Blazer", "Suits", 10.0, 100)
+                                new Product(null, null, "Blazer", "Suits", 10.0, new Inventory(null, null, 100))
                         )),
                         new Category(null, "Books", "Books", Set.of())
                 )
@@ -70,13 +76,13 @@ public class EntityTest {
                 () -> categories.forEach(System.out::println),
                 /*
                     Category[id=1, name=Electronics, description=Electronics Items, products=[]]
-                    Category[id=2, name=Clothing, description=Clothing Items, products=[Product[id=1, category=null, name=Blazer, description=Suits, price=10.0, quantity=100]]]
+                    Category[id=2, name=Clothing, description=Clothing Items, products=[Product[id=1, category=null, name=Blazer, description=Suits, price=10.0, inventory=Inventory[id=1, productId=null, quantity=100]]]]
                     Category[id=3, name=Books, description=Books, products=[]]
                 */
                 () -> categoriesRepositories.findAll().forEach(System.out::println),
                 /*
                     Category[id=1, name=Electronics, description=Electronics Items, products=[]]
-                    Category[id=2, name=Clothing, description=Clothing Items, products=[Product[id=1, category=2, name=Blazer, description=Suits, price=10.0, quantity=100]]]
+                    Category[id=2, name=Clothing, description=Clothing Items, products=[Product[id=1, category=2, name=Blazer, description=Suits, price=10.0, inventory=Inventory[id=1, productId=1, quantity=100]]]]
                     Category[id=3, name=Books, description=Books, products=[]]
                 */
                 () -> categoriesRepositories.findById(1L).ifPresent(System.out::println)
@@ -88,33 +94,33 @@ public class EntityTest {
         // PRODUCTS
         var products = productsRepositories.saveAll(
                 List.of(
-                        new Product(null, categories.get(0).id(), "Laptop", "Laptop", 1000.0, 10),
-                        new Product(null, categories.get(1).id(), "T-Shirt", "T-Shirt", 10.0, 100),
-                        new Product(null, categories.get(2).id(), "Java Book", "Java Book", 20.0, 50)
+                        new Product(null, categories.get(0).id(), "Laptop", "Laptop", 1000.0, new Inventory(null, null, 10)),
+                        new Product(null, categories.get(1).id(), "T-Shirt", "T-Shirt", 10.0, new Inventory(null, null, 100)),
+                        new Product(null, categories.get(2).id(), "Java Book", "Java Book", 20.0, new Inventory(null, null, 50))
                 )
         );
         assertAll(
                 () -> products.forEach(System.out::println),
                 /*
-                    Product[id=2, category=1, name=Laptop, description=Laptop, price=1000.0, quantity=10]
-                    Product[id=3, category=2, name=T-Shirt, description=T-Shirt, price=10.0, quantity=100]
-                    Product[id=4, category=3, name=Java Book, description=Java Book, price=20.0, quantity=50]
+                    Product[id=2, category=1, name=Laptop, description=Laptop, price=1000.0, inventory=Inventory[id=2, productId=null, quantity=10]]
+                    Product[id=3, category=2, name=T-Shirt, description=T-Shirt, price=10.0, inventory=Inventory[id=3, productId=null, quantity=100]]
+                    Product[id=4, category=3, name=Java Book, description=Java Book, price=20.0, inventory=Inventory[id=4, productId=null, quantity=50]]
                  */
                 () -> productsRepositories.findAll().forEach(System.out::println),
                 /*
-                    Product[id=1, category=2, name=Blazer, description=Suits, price=10.0, quantity=100]
-                    Product[id=2, category=1, name=Laptop, description=Laptop, price=1000.0, quantity=10]
-                    Product[id=3, category=2, name=T-Shirt, description=T-Shirt, price=10.0, quantity=100]
-                    Product[id=4, category=3, name=Java Book, description=Java Book, price=20.0, quantity=50]
+                    Product[id=1, category=2, name=Blazer, description=Suits, price=10.0, inventory=Inventory[id=1, productId=1, quantity=100]]
+                    Product[id=2, category=1, name=Laptop, description=Laptop, price=1000.0, inventory=Inventory[id=2, productId=2, quantity=10]]
+                    Product[id=3, category=2, name=T-Shirt, description=T-Shirt, price=10.0, inventory=Inventory[id=3, productId=3, quantity=100]]
+                    Product[id=4, category=3, name=Java Book, description=Java Book, price=20.0, inventory=Inventory[id=4, productId=4, quantity=50]]
                  */
                 () -> productsRepositories.findById(1L).ifPresent(System.out::println),
                 /*
-                    Product[id=1, category=2, name=Blazer, description=Suits, price=10.0, quantity=100]
+                    Product[id=1, category=2, name=Blazer, description=Suits, price=10.0, inventory=Inventory[id=1, productId=1, quantity=100]]
                  */
                 () -> productsRepositories.findByCategory(2L).forEach(System.out::println)
                 /*
-                    Product[id=1, category=2, name=Blazer, description=Suits, price=10.0, quantity=100]
-                    Product[id=3, category=2, name=T-Shirt, description=T-Shirt, price=10.0, quantity=100]
+                    Product[id=1, category=2, name=Blazer, description=Suits, price=10.0, inventory=Inventory[id=1, productId=1, quantity=100]]
+                    Product[id=3, category=2, name=T-Shirt, description=T-Shirt, price=10.0, inventory=Inventory[id=3, productId=3, quantity=100]]
                 */
         );
 
@@ -180,6 +186,33 @@ public class EntityTest {
                 /*
                     Order[id=1, userId=1, status=PENDING, products=[OrderProductRef[orderId=1, productId=2, quantity=2]]]
                     Order[id=2, userId=1, status=PENDING, products=[OrderProductRef[orderId=2, productId=3, quantity=3], OrderProductRef[orderId=2, productId=4, quantity=1]]]
+                */
+        );
+
+        //ORDER - UPDATE
+
+        //FAVORITE
+        var favorites = favoriteRepositories.saveAll(
+                List.of(
+                        new Favorite(null, 1L, Set.of()),
+                        new Favorite(null, 1L, Set.of()),
+                        new Favorite(null, 2L, Set.of(
+                                new FavoriteProductRef(null, products.get(0).id()),
+                                new FavoriteProductRef(null, products.get(1).id())
+                        ))
+                )
+        );
+
+        assertAll(
+                () -> favorites.forEach(System.out::println),
+                /*
+                    Favorite[id=1, userId=1, products=[]]
+                    Favorite[id=2, userId=2, products=[FavoriteProductRef[favoriteId=null, productId=2], FavoriteProductRef[favoriteId=null, productId=3]]]
+                */
+                () -> favoriteRepositories.findAll().forEach(System.out::println)
+                /*
+                    Favorite[id=1, userId=1, products=[]]
+                    Favorite[id=2, userId=2, products=[FavoriteProductRef[favoriteId=2, productId=2], FavoriteProductRef[favoriteId=2, productId=3]]]
                 */
         );
 

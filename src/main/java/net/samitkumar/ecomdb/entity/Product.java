@@ -7,5 +7,5 @@ import org.springframework.data.relational.core.mapping.Table;
 
 //Category Entity can be pull with this way - @ReadOnlyProperty @MappedCollection(idColumn = "id", keyColumn = "category") Category category
 @Table("products")
-public record Product(@Id Long id, Long category, String name, String description, Double price, Integer quantity) {
+public record Product(@Id Long id, Long category, String name, String description, Double price, @MappedCollection(idColumn = "product_id") Inventory inventory) {
 }

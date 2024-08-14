@@ -17,8 +17,13 @@ CREATE TABLE products (
       category INT REFERENCES categories(id) ON DELETE SET NULL,
       name VARCHAR(255) NOT NULL,
       description TEXT,
-      price DECIMAL(10, 2) NOT NULL,
-      quantity INT NOT NULL
+      price DECIMAL(10, 2) NOT NULL
+);
+
+CREATE TABLE inventory (
+       id SERIAL PRIMARY KEY,
+       product_id INT REFERENCES products(id) ON DELETE CASCADE,
+       quantity INT NOT NULL CHECK (quantity >= 0)
 );
 
 CREATE TABLE carts (
@@ -29,7 +34,7 @@ CREATE TABLE carts (
 CREATE TABLE cart_product_refs (
        cart_id INT REFERENCES carts(id) ON DELETE CASCADE,
        product_id INT REFERENCES products(id) ON DELETE CASCADE,
-       quantity INT NOT NULL,
+       quantity INT NOT NULL CHECK (quantity >= 0),
        PRIMARY KEY (cart_id, product_id)
 );
 
@@ -42,6 +47,17 @@ CREATE TABLE orders (
 CREATE TABLE order_product_refs (
     order_id INT REFERENCES orders(id) ON DELETE CASCADE,
     product_id INT REFERENCES products(id) ON DELETE CASCADE,
-    quantity INT NOT NULL,
+    quantity INT NOT NULL CHECK (quantity >= 0),
     PRIMARY KEY (order_id, product_id)
+);
+
+CREATE TABLE favorites (
+   id SERIAL PRIMARY KEY,
+   user_id INT REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE favorite_product_refs (
+   favorite_id INT REFERENCES favorites(id) ON DELETE CASCADE,
+   product_id INT REFERENCES products(id) ON DELETE CASCADE,
+   PRIMARY KEY (favorite_id, product_id)
 );
