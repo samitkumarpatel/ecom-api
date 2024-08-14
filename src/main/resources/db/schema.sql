@@ -27,8 +27,21 @@ CREATE TABLE carts (
 );
 
 CREATE TABLE cart_product_refs (
-       cart INT REFERENCES carts(id) ON DELETE CASCADE,
-       product INT REFERENCES products(id) ON DELETE CASCADE,
+       cart_id INT REFERENCES carts(id) ON DELETE CASCADE,
+       product_id INT REFERENCES products(id) ON DELETE CASCADE,
        quantity INT NOT NULL,
-       PRIMARY KEY (cart, product)
+       PRIMARY KEY (cart_id, product_id)
+);
+
+CREATE TABLE orders (
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    status VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE order_product_refs (
+    order_id INT REFERENCES orders(id) ON DELETE CASCADE,
+    product_id INT REFERENCES products(id) ON DELETE CASCADE,
+    quantity INT NOT NULL,
+    PRIMARY KEY (order_id, product_id)
 );
