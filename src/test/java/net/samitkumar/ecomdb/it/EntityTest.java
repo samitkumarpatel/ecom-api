@@ -10,11 +10,11 @@ import net.samitkumar.ecomdb.entity.favorite.Favorite;
 import net.samitkumar.ecomdb.entity.favorite.FavoriteProductRef;
 import net.samitkumar.ecomdb.entity.order.Order;
 import net.samitkumar.ecomdb.entity.order.OrderProductRef;
-import net.samitkumar.ecomdb.repository.CategoryRepositories;
-import net.samitkumar.ecomdb.repository.ProductRepositories;
-import net.samitkumar.ecomdb.repository.UserRepositories;
-import net.samitkumar.ecomdb.repository.cart.CartRepositories;
-import net.samitkumar.ecomdb.repository.favorite.FavoriteRepositories;
+import net.samitkumar.ecomdb.repository.CategoryRepository;
+import net.samitkumar.ecomdb.repository.ProductRepository;
+import net.samitkumar.ecomdb.repository.UserRepository;
+import net.samitkumar.ecomdb.repository.cart.CartRepository;
+import net.samitkumar.ecomdb.repository.favorite.FavoriteRepository;
 import net.samitkumar.ecomdb.repository.order.OrderRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,22 +31,22 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 @SpringBootTest
 public class EntityTest {
     @Autowired
-    CategoryRepositories categoriesRepositories;
+    CategoryRepository categoriesRepository;
 
     @Autowired
-    ProductRepositories productsRepositories;
+    ProductRepository productsRepository;
 
     @Autowired
-    UserRepositories usersRepositories;
+    UserRepository usersRepository;
 
     @Autowired
-    CartRepositories cartRepositories;
+    CartRepository cartRepository;
 
     @Autowired
-    OrderRepository orderRepositories;
+    OrderRepository orderRepository;
 
     @Autowired
-    FavoriteRepositories favoriteRepositories;
+    FavoriteRepository favoriteRepository;
 
     @Test
     @DisplayName("Entity Test")
@@ -54,7 +54,7 @@ public class EntityTest {
 
         //USERS
         assertAll(
-                () -> usersRepositories.findAll().forEach(System.out::println)
+                () -> usersRepository.findAll().forEach(System.out::println)
                 /*
                 User[id=1, name=John Doe, email=johndoe@dev.net]
                 User[id=2, name=Jane Doe, email=janedoe@dev.net]
@@ -62,7 +62,7 @@ public class EntityTest {
         );
 
         //CATEGORIES
-        var categories = categoriesRepositories.saveAll(
+        var categories = categoriesRepository.saveAll(
                 List.of(
                         new Category(null, "Electronics", "Electronics Items", Set.of()),
                         new Category(null, "Clothing", "Clothing Items", Set.of(
@@ -79,24 +79,33 @@ public class EntityTest {
                     Category[id=2, name=Clothing, description=Clothing Items, products=[Product[id=1, category=null, name=Blazer, description=Suits, price=10.0, inventory=Inventory[id=1, productId=null, quantity=100]]]]
                     Category[id=3, name=Books, description=Books, products=[]]
                 */
-                () -> categoriesRepositories.findAll().forEach(System.out::println),
+                () -> categoriesRepository.findAll().forEach(System.out::println),
                 /*
                     Category[id=1, name=Electronics, description=Electronics Items, products=[]]
                     Category[id=2, name=Clothing, description=Clothing Items, products=[Product[id=1, category=2, name=Blazer, description=Suits, price=10.0, inventory=Inventory[id=1, productId=1, quantity=100]]]]
                     Category[id=3, name=Books, description=Books, products=[]]
                 */
-                () -> categoriesRepositories.findById(1L).ifPresent(System.out::println)
+                () -> categoriesRepository.findById(1L).ifPresent(System.out::println)
                 /*
                     Category[id=1, name=Electronics, description=Electronics Items, products=[]]
                 */
         );
 
+        var changecategory = categoriesRepository.save(new Category(1L, "Electronics", "Electronics Goods", Set.of()));
+        assertAll(
+                () -> System.out.println(changecategory),
+                () -> categoriesRepository.findById(1L).ifPresent(System.out::println)
+                /*
+                    Category[id=1, name=Electronics, description=Electronics Goods, products=[]]
+                */
+        );
+
         // PRODUCTS
-        var products = productsRepositories.saveAll(
+        var products = productsRepository.saveAll(
                 List.of(
-                        new Product(null, categories.get(0).id(), "Laptop", "Laptop", 1000.0, new Inventory(null, null, 10)),
-                        new Product(null, categories.get(1).id(), "T-Shirt", "T-Shirt", 10.0, new Inventory(null, null, 100)),
-                        new Product(null, categories.get(2).id(), "Java Book", "Java Book", 20.0, new Inventory(null, null, 50))
+                        new Product(null, categories.get(0).getId(), "Laptop", "Laptop", 1000.0, new Inventory(null, null, 10)),
+                        new Product(null, categories.get(1).getId(), "T-Shirt", "T-Shirt", 10.0, new Inventory(null, null, 100)),
+                        new Product(null, categories.get(2).getId(), "Java Book", "Java Book", 20.0, new Inventory(null, null, 50))
                 )
         );
         assertAll(
@@ -106,18 +115,18 @@ public class EntityTest {
                     Product[id=3, category=2, name=T-Shirt, description=T-Shirt, price=10.0, inventory=Inventory[id=3, productId=null, quantity=100]]
                     Product[id=4, category=3, name=Java Book, description=Java Book, price=20.0, inventory=Inventory[id=4, productId=null, quantity=50]]
                  */
-                () -> productsRepositories.findAll().forEach(System.out::println),
+                () -> productsRepository.findAll().forEach(System.out::println),
                 /*
                     Product[id=1, category=2, name=Blazer, description=Suits, price=10.0, inventory=Inventory[id=1, productId=1, quantity=100]]
                     Product[id=2, category=1, name=Laptop, description=Laptop, price=1000.0, inventory=Inventory[id=2, productId=2, quantity=10]]
                     Product[id=3, category=2, name=T-Shirt, description=T-Shirt, price=10.0, inventory=Inventory[id=3, productId=3, quantity=100]]
                     Product[id=4, category=3, name=Java Book, description=Java Book, price=20.0, inventory=Inventory[id=4, productId=4, quantity=50]]
                  */
-                () -> productsRepositories.findById(1L).ifPresent(System.out::println),
+                () -> productsRepository.findById(1L).ifPresent(System.out::println),
                 /*
                     Product[id=1, category=2, name=Blazer, description=Suits, price=10.0, inventory=Inventory[id=1, productId=1, quantity=100]]
                  */
-                () -> productsRepositories.findByCategory(2L).forEach(System.out::println)
+                () -> productsRepository.findByCategory(2L).forEach(System.out::println)
                 /*
                     Product[id=1, category=2, name=Blazer, description=Suits, price=10.0, inventory=Inventory[id=1, productId=1, quantity=100]]
                     Product[id=3, category=2, name=T-Shirt, description=T-Shirt, price=10.0, inventory=Inventory[id=3, productId=3, quantity=100]]
@@ -125,15 +134,15 @@ public class EntityTest {
         );
 
         //CART
-        var carts = cartRepositories.saveAll(
+        var carts = cartRepository.saveAll(
                 List.of(
                         new Cart(null, 1L, Set.of(
-                                new CartProductRef(null, products.get(0).id(), 2),
-                                new CartProductRef(null, products.get(1).id(), 3)
+                                new CartProductRef(null, products.get(0).getId(), 2),
+                                new CartProductRef(null, products.get(1).getId(), 3)
                         )),
                         new Cart(null, 2L, Set.of(
-                                new CartProductRef(null, products.get(1).id(), 1),
-                                new CartProductRef(null, products.get(2).id(), 2)
+                                new CartProductRef(null, products.get(1).getId(), 1),
+                                new CartProductRef(null, products.get(2).getId(), 2)
                         ))
                 )
         );
@@ -143,7 +152,7 @@ public class EntityTest {
                     Cart[id=1, userId=1, cartItems=[CartProductRef[cartId=null, productId=2, quantity=2], CartProductRef[cartId=null, productId=3, quantity=3]]]
                     Cart[id=2, userId=2, cartItems=[CartProductRef[cartId=null, productId=3, quantity=1], CartProductRef[cartId=null, productId=4, quantity=2]]]
                 */
-                () -> cartRepositories.findAll().forEach(System.out::println)
+                () -> cartRepository.findAll().forEach(System.out::println)
                 /*
                     Cart[id=1, userId=1, cartItems=[CartProductRef[cartId=1, productId=2, quantity=2], CartProductRef[cartId=1, productId=3, quantity=3]]]
                     Cart[id=2, userId=2, cartItems=[CartProductRef[cartId=2, productId=3, quantity=1], CartProductRef[cartId=2, productId=4, quantity=2]]]
@@ -151,17 +160,17 @@ public class EntityTest {
         );
 
         //ORDER
-        var orders = orderRepositories.saveAll(
+        var orders = orderRepository.saveAll(
                 List.of(
                         new Order(null, 1L, Order.OrderStatus.PENDING, Set.of(
-                                new OrderProductRef(null, products.get(0).id(), 2)
+                                new OrderProductRef(null, products.get(0).getId(), 2)
                         )),
                         new Order(null, 1L, Order.OrderStatus.PENDING, Set.of(
-                                new OrderProductRef(null, products.get(1).id(), 3),
-                                new OrderProductRef(null, products.get(2).id(), 1)
+                                new OrderProductRef(null, products.get(1).getId(), 3),
+                                new OrderProductRef(null, products.get(2).getId(), 1)
                         )),
                         new Order(null, 2L, Order.OrderStatus.PENDING, Set.of(
-                                new OrderProductRef(null, products.get(2).id(), 2)
+                                new OrderProductRef(null, products.get(2).getId(), 2)
                         ))
                 )
         );
@@ -172,17 +181,17 @@ public class EntityTest {
                     Order[id=2, userId=1, status=PENDING, products=[OrderProductRef[orderId=null, productId=3, quantity=3], OrderProductRef[orderId=null, productId=4, quantity=1]]]
                     Order[id=3, userId=2, status=PENDING, products=[OrderProductRef[orderId=null, productId=4, quantity=2]]]
                 */
-                () -> orderRepositories.findAll().forEach(System.out::println),
+                () -> orderRepository.findAll().forEach(System.out::println),
                 /*
                     Order[id=1, userId=1, status=PENDING, products=[OrderProductRef[orderId=1, productId=2, quantity=2]]]
                     Order[id=2, userId=1, status=PENDING, products=[OrderProductRef[orderId=2, productId=3, quantity=3], OrderProductRef[orderId=2, productId=4, quantity=1]]]
                     Order[id=3, userId=2, status=PENDING, products=[OrderProductRef[orderId=3, productId=4, quantity=2]]]
                 */
-                () -> orderRepositories.findById(1L).ifPresent(System.out::println),
+                () -> orderRepository.findById(1L).ifPresent(System.out::println),
                 /*
                     Order[id=1, userId=1, status=PENDING, products=[OrderProductRef[orderId=1, productId=2, quantity=2]]]
                 */
-                () -> orderRepositories.findByUserId(1L).forEach(System.out::println)
+                () -> orderRepository.findByUserId(1L).forEach(System.out::println)
                 /*
                     Order[id=1, userId=1, status=PENDING, products=[OrderProductRef[orderId=1, productId=2, quantity=2]]]
                     Order[id=2, userId=1, status=PENDING, products=[OrderProductRef[orderId=2, productId=3, quantity=3], OrderProductRef[orderId=2, productId=4, quantity=1]]]
@@ -192,13 +201,13 @@ public class EntityTest {
         //ORDER - UPDATE
 
         //FAVORITE
-        var favorites = favoriteRepositories.saveAll(
+        var favorites = favoriteRepository.saveAll(
                 List.of(
                         new Favorite(null, 1L, Set.of()),
                         new Favorite(null, 1L, Set.of()),
                         new Favorite(null, 2L, Set.of(
-                                new FavoriteProductRef(null, products.get(0).id()),
-                                new FavoriteProductRef(null, products.get(1).id())
+                                new FavoriteProductRef(null, products.get(0).getId()),
+                                new FavoriteProductRef(null, products.get(1).getId())
                         ))
                 )
         );
@@ -209,7 +218,7 @@ public class EntityTest {
                     Favorite[id=1, userId=1, products=[]]
                     Favorite[id=2, userId=2, products=[FavoriteProductRef[favoriteId=null, productId=2], FavoriteProductRef[favoriteId=null, productId=3]]]
                 */
-                () -> favoriteRepositories.findAll().forEach(System.out::println)
+                () -> favoriteRepository.findAll().forEach(System.out::println)
                 /*
                     Favorite[id=1, userId=1, products=[]]
                     Favorite[id=2, userId=2, products=[FavoriteProductRef[favoriteId=2, productId=2], FavoriteProductRef[favoriteId=2, productId=3]]]

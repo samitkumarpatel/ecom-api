@@ -1,5 +1,9 @@
 package net.samitkumar.ecomdb.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
@@ -7,5 +11,15 @@ import org.springframework.data.relational.core.mapping.Table;
 import java.util.Set;
 
 @Table("categories")
-public record Category(@Id Long id, String name, String description, @MappedCollection(idColumn = "category") Set<Product> products) {
+@AllArgsConstructor
+@Data
+@Builder
+@NoArgsConstructor
+public class Category {
+    @Id
+    private Long id;
+    private String name;
+    private String description;
+    @MappedCollection(idColumn = "category")
+    private Set<Product> products;
 }

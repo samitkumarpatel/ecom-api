@@ -1,0 +1,59 @@
+###
+POST http://localhost:8080/categories
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Clothes",
+  "description": "Mens Clothes"
+}
+
+###
+POST http://localhost:8080/categories
+Content-Type: application/json
+Accept: application/json
+
+{
+    "name": "Electronics",
+    "description": "Electronics Items",
+    "products" : [
+        {
+            "name": "Laptop",
+            "description": "Laptop",
+            "price": 1000,
+            "inventory": {
+                "quantity": 10
+            }
+        },
+        {
+            "name": "Mobile",
+            "description": "Mobile",
+            "price": 500
+        }
+    ]
+}
+
+
+### GET/1
+GET http://localhost:8080/categories/1
+Accept: application/json
+
+
+### PUT/1
+PUT http://localhost:8080/categories/1
+Content-Type: application/json
+Accept: application/json
+
+{
+    "id": 1,
+    "name": "Electronics",
+    "description": "Electronics Goods"
+}
+
+### GET/1
+GET http://localhost:8080/categories/1
+Accept: application/json
+
+### GET
+GET http://localhost:8080/categories
+Accept: application/json
