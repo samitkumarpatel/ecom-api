@@ -33,6 +33,14 @@ Accept: application/json
     ]
 }
 
+### PATCH/1
+PATCH http://localhost:8080/categories/1
+Content-Type: application/json
+Accept: application/json
+
+{
+    "description": "Mens & Women Clothes"
+}
 
 ### GET/1
 GET http://localhost:8080/categories/1
