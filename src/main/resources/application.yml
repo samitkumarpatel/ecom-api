@@ -1,0 +1,17 @@
+logging:
+  level:
+    org.springframework.jdbc: TRACE
+
+spring:
+  application:
+    name: ecom-db
+  threads:
+    virtual:
+      enabled: true
+  data:
+    rest:
+#      base-path: /api
+#      return-body-on-create: true
+#      return-body-on-update: true
+      default-media-type: application/json
+
