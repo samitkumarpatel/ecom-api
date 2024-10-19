@@ -1,6 +1,7 @@
+@HOST=http://localhost:8080
+
 ###
-POST http://localhost:8080/categories
-Content-Type: application/json
+POST {{HOST}}/json
 Accept: application/json
 
 {
@@ -9,7 +10,7 @@ Accept: application/json
 }
 
 ###
-POST http://localhost:8080/categories
+POST {{HOST}}/categories
 Content-Type: application/json
 Accept: application/json
 
@@ -34,7 +35,7 @@ Accept: application/json
 }
 
 ### PATCH/1
-PATCH http://localhost:8080/categories/1
+PATCH {{HOST}}/categories/1
 Content-Type: application/json
 Accept: application/json
 
@@ -43,12 +44,12 @@ Accept: application/json
 }
 
 ### GET/1
-GET http://localhost:8080/categories/1
+GET {{HOST}}/categories/1
 Accept: application/json
 
 
 ### PUT/1
-PUT http://localhost:8080/categories/1
+PUT {{HOST}}/categories/1
 Content-Type: application/json
 Accept: application/json
 
@@ -59,9 +60,9 @@ Accept: application/json
 }
 
 ### GET/1
-GET http://localhost:8080/categories/1
+GET {{HOST}}/categories/1
 Accept: application/json
 
 ### GET
-GET http://localhost:8080/categories
+GET {{HOST}}/categories
 Accept: application/json

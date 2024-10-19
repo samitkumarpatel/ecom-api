@@ -1,5 +1,7 @@
+@HOST=http://localhost:8080
+
 ###
-GET http://localhost:8080/products
+GET {{HOST}}/products
 Accept: application/json
 
 ###
