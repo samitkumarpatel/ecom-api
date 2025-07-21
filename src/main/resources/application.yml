@@ -4,7 +4,7 @@ logging:
 
 spring:
   application:
-    name: ecom-db
+    name: ecom-api
   threads:
     virtual:
       enabled: true
