@@ -1,17 +1,17 @@
 package net.samitkumar.ecom.it;
 
 import net.samitkumar.ecom.TestcontainersConfiguration;
-import net.samitkumar.ecom.catelog.entity.Category;
-import net.samitkumar.ecom.catelog.entity.Inventory;
-import net.samitkumar.ecom.catelog.entity.Product;
+import net.samitkumar.ecom.catalog.entity.Category;
+import net.samitkumar.ecom.catalog.entity.Inventory;
+import net.samitkumar.ecom.catalog.entity.Product;
 import net.samitkumar.ecom.cart.entity.Cart;
 import net.samitkumar.ecom.cart.entity.CartProductRef;
 import net.samitkumar.ecom.favorite.entity.Favorite;
 import net.samitkumar.ecom.favorite.entity.FavoriteProductRef;
 import net.samitkumar.ecom.order.entity.Order;
 import net.samitkumar.ecom.order.entity.OrderProductRef;
-import net.samitkumar.ecom.catelog.repository.CategoryRepository;
-import net.samitkumar.ecom.catelog.repository.ProductRepository;
+import net.samitkumar.ecom.catalog.repository.CategoryRepository;
+import net.samitkumar.ecom.catalog.repository.ProductRepository;
 import net.samitkumar.ecom.admin.repository.UserRepository;
 import net.samitkumar.ecom.cart.repository.CartRepository;
 import net.samitkumar.ecom.favorite.repository.FavoriteRepository;
@@ -126,11 +126,18 @@ public class EntityTest {
                 /*
                     Product[id=1, category=2, name=Blazer, description=Suits, price=10.0, inventory=Inventory[id=1, productId=1, quantity=100]]
                  */
-                () -> productsRepository.findByCategory(2L).forEach(System.out::println)
+                () -> productsRepository.findByCategory(2L).forEach(System.out::println),
                 /*
                     Product[id=1, category=2, name=Blazer, description=Suits, price=10.0, inventory=Inventory[id=1, productId=1, quantity=100]]
                     Product[id=3, category=2, name=T-Shirt, description=T-Shirt, price=10.0, inventory=Inventory[id=3, productId=3, quantity=100]]
                 */
+                () -> {
+                    System.out.println("#####################");
+                    productsRepository.findProductByCategoryAndId(2L, 1L).ifPresent(System.out::println);
+                    System.out.println("#####################");
+
+                }
+                //Product(id=1, category=2, name=Blazer, description=Suits, price=10.0, inventory=Inventory(id=1, productId=1, quantity=100))
         );
 
         //CART

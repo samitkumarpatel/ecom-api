@@ -1,4 +1,4 @@
-package net.samitkumar.ecom.catelog.entity;
+package net.samitkumar.ecom.catalog.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

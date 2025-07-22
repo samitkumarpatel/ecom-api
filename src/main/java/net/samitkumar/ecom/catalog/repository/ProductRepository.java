@@ -1,15 +1,14 @@
-package net.samitkumar.ecom.catelog.repository;
+package net.samitkumar.ecom.catalog.repository;
 
-import net.samitkumar.ecom.catelog.entity.Product;
+import net.samitkumar.ecom.catalog.entity.Product;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.ListPagingAndSortingRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ProductRepository extends ListPagingAndSortingRepository<Product, Long>, ListCrudRepository<Product, Long> {
     List<Product> findByCategory(Long categoryId);
-    List<Product> findByName(String name);
-    List<Product> findByNameContaining(String name);
-    List<Product> findByNameContainingIgnoreCase(String name);
-
+    Optional<Product> findProductByCategoryAndId(Long categoryId, Long productId);
+    void deleteProductByCategoryAndId(Long categoryId, Long productId);
 }

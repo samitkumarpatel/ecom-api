@@ -1,6 +1,6 @@
-package net.samitkumar.ecom.catelog.repository;
+package net.samitkumar.ecom.catalog.repository;
 
-import net.samitkumar.ecom.catelog.entity.Inventory;
+import net.samitkumar.ecom.catalog.entity.Inventory;
 import org.springframework.data.repository.ListCrudRepository;
 public interface InventoryRepository extends ListCrudRepository<Inventory, Long> {
 }
