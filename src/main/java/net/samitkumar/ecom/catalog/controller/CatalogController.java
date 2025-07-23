@@ -49,6 +49,10 @@ public class CatalogController {
                         .PATCH("/{id}", this::patchCategory)
                         .DELETE("/{id}", this::deleteCategory)
                 )
+                .after((request, response) -> {
+                    log.info("{} {} {}", request.method(), request.path(), response.statusCode());
+                    return response;
+                })
                 .build();
     }
 
@@ -88,8 +92,9 @@ public class CatalogController {
         var categoryId = Long.valueOf(request.pathVariable("id"));
         var productId = Long.valueOf(request.pathVariable("productId"));
         log.info("##deleteProductByCategoryId## categoryId: {}, productId: {}", categoryId, productId);
-        return Mono.fromRunnable(() -> productRepository.deleteProductByCategoryAndId(categoryId, productId))
+        return Mono.fromCallable(() -> productRepository.findProductByCategoryAndId(categoryId, productId).orElseThrow(ProductNotFoundException::new))
                 .subscribeOn(Schedulers.boundedElastic())
+                .flatMap(product -> Mono.fromRunnable(() -> productRepository.delete(product)).subscribeOn(Schedulers.boundedElastic()))
                 .then(ServerResponse.ok().build());
     }
 

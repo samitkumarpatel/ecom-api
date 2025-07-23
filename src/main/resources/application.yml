@@ -1,20 +1,15 @@
 
 logging:
   level:
-    org.springframework.jdbc: TRACE
+    org.springframework.jdbc: DEBUG
 
 spring:
   application:
-    name: ecom-api
+    name: @project.name@
   threads:
     virtual:
       enabled: true
-  data:
-    rest:
-#      base-path: /api
-#      return-body-on-create: true
-#      return-body-on-update: true
-      default-media-type: application/json
+
 server:
   error:
     include-message: always

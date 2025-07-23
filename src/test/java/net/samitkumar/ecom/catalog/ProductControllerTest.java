@@ -166,7 +166,19 @@ public class ProductControllerTest {
                               "price": 799.99,
                               "inventory": {"id":1,"productId":null,"quantity":50}
                             }
-                        """)
+                        """),
+                () -> webTestClient
+                        .delete()
+                        .uri("/category/{categoryId}/product/{id}", categoryId.get(), 1)
+                        .exchange()
+                        .expectStatus()
+                        .isOk(),
+                () -> webTestClient
+                        .get()
+                        .uri("/category/{categoryId}/product/{id}", categoryId.get(), 1)
+                        .exchange()
+                        .expectStatus()
+                        .isNotFound()
 
         );
     }
