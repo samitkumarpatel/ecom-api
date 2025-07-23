@@ -149,7 +149,8 @@ public class ProductControllerTest {
                         .bodyValue("""
                                 {
                                     "inventory": {
-                                        "quantity": 50
+                                        "quantity": 50,
+                                        "quantityReserved": 0
                                     }
                                 }
                                 """)

@@ -66,7 +66,7 @@ public class EntityTest {
                 List.of(
                         new Category(null, "Electronics", "Electronics Items", Set.of()),
                         new Category(null, "Clothing", "Clothing Items", Set.of(
-                                new Product(null, null, "Blazer", "Suits", 10.0, new Inventory(null, null, 100))
+                                new Product(null, null, "Blazer", "Suits", 10.0, new Inventory(null, null, 100, 0))
                         )),
                         new Category(null, "Books", "Books", Set.of())
                 )
@@ -103,9 +103,9 @@ public class EntityTest {
         // PRODUCTS
         var products = productsRepository.saveAll(
                 List.of(
-                        new Product(null, categories.get(0).getId(), "Laptop", "Laptop", 1000.0, new Inventory(null, null, 10)),
-                        new Product(null, categories.get(1).getId(), "T-Shirt", "T-Shirt", 10.0, new Inventory(null, null, 100)),
-                        new Product(null, categories.get(2).getId(), "Java Book", "Java Book", 20.0, new Inventory(null, null, 50))
+                        new Product(null, categories.get(0).getId(), "Laptop", "Laptop", 1000.0, new Inventory(null, null, 10, 0)),
+                        new Product(null, categories.get(1).getId(), "T-Shirt", "T-Shirt", 10.0, new Inventory(null, null, 100, 0)),
+                        new Product(null, categories.get(2).getId(), "Java Book", "Java Book", 20.0, new Inventory(null, null, 50, 0))
                 )
         );
         assertAll(

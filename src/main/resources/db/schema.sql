@@ -23,7 +23,8 @@ CREATE TABLE products (
 CREATE TABLE inventory (
        id SERIAL PRIMARY KEY,
        product_id INT REFERENCES products(id) ON DELETE CASCADE,
-       quantity INT NOT NULL CHECK (quantity >= 0)
+       quantity INT NOT NULL CHECK (quantity >= 0),
+       quantity_reserved INT NOT NULL CHECK (quantity_reserved <= quantity)
 );
 
 CREATE TABLE carts (

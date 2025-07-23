@@ -11,7 +11,4 @@ import java.util.Optional;
 public interface ProductRepository extends ListPagingAndSortingRepository<Product, Long>, ListCrudRepository<Product, Long> {
     List<Product> findByCategory(Long categoryId);
     Optional<Product> findProductByCategoryAndId(Long categoryId, Long productId);
-    //delete product by category and id
-    @Query("DELETE FROM products WHERE category = :categoryId AND id = :productId")
-    void deleteProductByCategoryAndId(Long categoryId, Long productId);
 }
