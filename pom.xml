@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>net.samitkumar</groupId>
-	<artifactId>ecom-api</artifactId>
+	<artifactId>ecom-modulith</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
-	<name>ecom-api</name>
+	<name>ecom-modulith</name>
 	<description>ecom api with springboot</description>
 	<url/>
 	<licenses>
