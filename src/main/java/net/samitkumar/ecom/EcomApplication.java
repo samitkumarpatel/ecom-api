@@ -8,10 +8,10 @@ import org.springframework.web.cors.reactive.CorsWebFilter;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
 @SpringBootApplication
-public class EcomApiApplication {
+public class EcomApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(EcomApiApplication.class, args);
+		SpringApplication.run(EcomApplication.class, args);
 	}
 
 	@Bean
