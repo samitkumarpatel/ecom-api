@@ -20,6 +20,15 @@ CREATE TABLE products (
       price DECIMAL(10, 2) NOT NULL
 );
 
+CREATE TABLE product_offers (
+    id SERIAL PRIMARY KEY,
+    product_id INT REFERENCES products(id) ON DELETE CASCADE,
+    discount_percent DECIMAL(5,2) NOT NULL CHECK (discount_percent >= 0 AND discount_percent <= 100),
+    valid_from DATE NOT NULL,
+    valid_to DATE NOT NULL,
+    description TEXT
+);
+
 CREATE TABLE inventory (
        id SERIAL PRIMARY KEY,
        product_id INT REFERENCES products(id) ON DELETE CASCADE,

@@ -1,88 +1,676 @@
-openapi: 3.0.0
+openapi: 3.0.3
 info:
-  title: Category Service API
+  title: Category and Product Management API
+  description: API for managing categories and products with inventory tracking
   version: 1.0.0
+  contact:
+    name: API Support
+    email: support@example.com
+servers:
+  - url: https://api.example.com/v1
+    description: Production server
+  - url: https://staging-api.example.com/v1
+    description: Staging server
+
 paths:
-  /categories:
-    post:
-      summary: Create a new category
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                description:
-                  type: string
-      responses:
-        '201':
-          description: Category created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Category'
+  /category:
     get:
-      summary: List all categories
+      summary: Get all categories
+      description: Retrieve a list of all categories
+      operationId: getAllCategories
+      tags:
+        - Categories
       responses:
         '200':
-          description: List of categories
+          description: Successful response
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/Category'
-  /categories/{id}:
-    get:
-      summary: Get category details
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Category details
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Category'
-    put:
-      summary: Update category details
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      summary: Create a new category
+      description: Create a new category (id is auto-generated)
+      operationId: createCategory
+      tags:
+        - Categories
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                description:
-                  type: string
+              $ref: '#/components/schemas/CategoryCreate'
+      responses:
+        '201':
+          description: Category created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /category/{id}:
+    get:
+      summary: Get category by ID
+      description: Retrieve a specific category by its ID
+      operationId: getCategoryById
+      tags:
+        - Categories
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Category ID
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
       responses:
         '200':
-          description: Category updated
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      summary: Update category
+      description: Update an entire category (id is required)
+      operationId: updateCategory
+      tags:
+        - Categories
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Category ID
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryUpdate'
+      responses:
+        '200':
+          description: Category updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    patch:
+      summary: Partially update category
+      description: Partially update a category (id is required)
+      operationId: patchCategory
+      tags:
+        - Categories
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Category ID
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryUpdate'
+      responses:
+        '200':
+          description: Category updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      summary: Delete category
+      description: Delete a category by ID
+      operationId: deleteCategory
+      tags:
+        - Categories
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Category ID
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      responses:
+        '204':
+          description: Category deleted successfully
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /category/{id}/products:
+    get:
+      summary: Get all products in a category
+      description: Retrieve all products belonging to a specific category
+      operationId: getCategoryProducts
+      tags:
+        - Products
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Category ID
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      summary: Create a new product in a category
+      description: Create a new product in a specific category (id is auto-generated)
+      operationId: createCategoryProduct
+      tags:
+        - Products
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Category ID
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductCreate'
+      responses:
+        '201':
+          description: Product created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /category/{id}/products/{productId}:
+    get:
+      summary: Get product by ID in a category
+      description: Retrieve a specific product by its ID within a category
+      operationId: getCategoryProductById
+      tags:
+        - Products
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Category ID
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+        - name: productId
+          in: path
+          required: true
+          description: Product ID
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      summary: Update product in a category
+      description: Update an entire product (id is required)
+      operationId: updateCategoryProduct
+      tags:
+        - Products
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Category ID
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+        - name: productId
+          in: path
+          required: true
+          description: Product ID
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductUpdate'
+      responses:
+        '200':
+          description: Product updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    patch:
+      summary: Partially update product in a category
+      description: Partially update a product (id is required)
+      operationId: patchCategoryProduct
+      tags:
+        - Products
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Category ID
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+        - name: productId
+          in: path
+          required: true
+          description: Product ID
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductUpdate'
+      responses:
+        '200':
+          description: Product updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      summary: Delete product in a category
+      description: Delete a product by ID within a category
+      operationId: deleteCategoryProduct
+      tags:
+        - Products
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Category ID
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+        - name: productId
+          in: path
+          required: true
+          description: Product ID
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      responses:
+        '204':
+          description: Product deleted successfully
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
 components:
   schemas:
-    Category:
+    Inventory:
       type: object
+      required:
+        - productId
+        - quantity
+        - quantityReserved
       properties:
         id:
           type: integer
+          format: int64
+          description: Inventory ID (auto-generated)
+          example: 1
+        productId:
+          type: integer
+          format: int64
+          description: Product ID this inventory belongs to
+          example: 123
+        quantity:
+          type: integer
+          description: Available quantity
+          minimum: 0
+          example: 100
+        quantityReserved:
+          type: integer
+          description: Reserved quantity
+          minimum: 0
+          example: 10
+
+    Product:
+      type: object
+      required:
+        - id
+        - category
+        - name
+        - description
+        - price
+        - inventory
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Product ID
+          example: 123
+        category:
+          type: integer
+          format: int64
+          description: Category ID this product belongs to
+          example: 1
         name:
           type: string
+          description: Product name
+          example: "Wireless Headphones"
         description:
           type: string
+          description: Product description
+          example: "High-quality wireless headphones with noise cancellation"
+        price:
+          type: number
+          format: double
+          description: Product price
+          minimum: 0
+          example: 199.99
+        inventory:
+          $ref: '#/components/schemas/Inventory'
+
+    ProductCreate:
+      type: object
+      required:
+        - name
+        - description
+        - price
+        - inventory
+      properties:
+        category:
+          type: integer
+          format: int64
+          description: Category ID this product belongs to (optional - can be inferred from path)
+          example: 1
+        name:
+          type: string
+          description: Product name
+          example: "Wireless Headphones"
+        description:
+          type: string
+          description: Product description
+          example: "High-quality wireless headphones with noise cancellation"
+        price:
+          type: number
+          format: double
+          description: Product price
+          minimum: 0
+          example: 199.99
+        inventory:
+          type: object
+          required:
+            - productId
+            - quantity
+            - quantityReserved
+          properties:
+            productId:
+              type: integer
+              format: int64
+              description: Product ID this inventory belongs to (will be set automatically)
+              example: 123
+            quantity:
+              type: integer
+              description: Available quantity
+              minimum: 0
+              example: 100
+            quantityReserved:
+              type: integer
+              description: Reserved quantity
+              minimum: 0
+              example: 10
+
+    ProductUpdate:
+      type: object
+      properties:
+        category:
+          type: integer
+          format: int64
+          description: Category ID this product belongs to (optional - can be inferred from path)
+          example: 1
+        name:
+          type: string
+          description: Product name
+          example: "Wireless Headphones"
+        description:
+          type: string
+          description: Product description
+          example: "High-quality wireless headphones with noise cancellation"
+        price:
+          type: number
+          format: double
+          description: Product price
+          minimum: 0
+          example: 199.99
+        inventory:
+          type: object
+          properties:
+            productId:
+              type: integer
+              format: int64
+              description: Product ID this inventory belongs to
+              example: 123
+            quantity:
+              type: integer
+              description: Available quantity
+              minimum: 0
+              example: 100
+            quantityReserved:
+              type: integer
+              description: Reserved quantity
+              minimum: 0
+              example: 10
+
+    Category:
+      type: object
+      required:
+        - id
+        - name
+        - description
+        - products
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Category ID
+          example: 1
+        name:
+          type: string
+          description: Category name
+          example: "Electronics"
+        description:
+          type: string
+          description: Category description
+          example: "Electronic devices and accessories"
         products:
           type: array
+          description: List of products in this category
+          items:
+            $ref: '#/components/schemas/Product'
+
+    CategoryCreate:
+      type: object
+      required:
+        - name
+        - description
+      properties:
+        name:
+          type: string
+          description: Category name
+          example: "Electronics"
+        description:
+          type: string
+          description: Category description
+          example: "Electronic devices and accessories"
+        products:
+          type: array
+          description: List of products in this category (optional)
+          items:
+            $ref: '#/components/schemas/ProductCreate'
+
+    CategoryUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Category name
+          example: "Electronics"
+        description:
+          type: string
+          description: Category description
+          example: "Electronic devices and accessories"
+        products:
+          type: array
+          description: List of products in this category (optional)
+          items:
+            $ref: '#/components/schemas/Product'
+
+    Error:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          description: Error message
+          example: "An error occurred"
+        code:
+          type: string
+          description: Error code
+          example: "VALIDATION_ERROR"
+        details:
+          type: object
+          description: Additional error details
+          additionalProperties: true
+
+  responses:
+    BadRequest:
+      description: Bad request - Invalid input data
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            message: "Invalid input data"
+            code: "VALIDATION_ERROR"
+            details:
+              field: "name"
+              reason: "Name is required"
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            message: "Resource not found"
+            code: "NOT_FOUND"
+
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            message: "Internal server error"
+            code: "INTERNAL_ERROR"
+
+tags:
+  - name: Categories
+    description: Category management operations
+  - name: Products
+    description: Product management operations
